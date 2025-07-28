@@ -38,7 +38,7 @@ duolingo-lazy/
 ## 🚀 Installation
 
 ### Method 1: From GitHub Releases (Recommended)
-1. Go to the [Releases page](https://github.com/yourusername/Duolingo-Lazy/releases)
+1. Go to the [Releases page](https://github.com/kenzn2/Duolingo-Lazy/releases)
 2. Download the latest `duolingo-lazy-v1.0.zip` file
 3. Extract the ZIP file to a folder
 4. Open Chrome and go to `chrome://extensions/`
