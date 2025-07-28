@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "Duolingo Lazy",
+  "version": "1.0.0",
+  "description": "Automate Duolingo lessons to maintain your learning streak effortlessly. Beautiful UI with dark mode, real-time progress tracking, and smart persistence.",
+  "author": "Kenzn2 <https://www.fb.com/kenzn2>",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.duolingo.com/*"],
+      "js": ["src/content.js"]
+    }
+  ],
+  "host_permissions": ["https://www.duolingo.com/*"],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Duolingo Lazy",
+    "default_icon": {
+      "16": "src/icons/duolingo16.png",
+      "32": "src/icons/duolingo64.png",
+      "48": "src/icons/duolingo64.png",
+      "128": "src/icons/duolingo128.png"
+    }
+  },
+  "icons": {
+    "16": "src/icons/duolingo16.png",
+    "32": "src/icons/duolingo64.png",
+    "48": "src/icons/duolingo64.png",
+    "128": "src/icons/duolingo128.png",
+    "256": "src/icons/duolingo256.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/icons/*"],
+      "matches": ["https://www.duolingo.com/*"]
+    }
+  ]
+}
