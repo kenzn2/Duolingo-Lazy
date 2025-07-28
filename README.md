@@ -48,7 +48,7 @@ duolingo-lazy/
 ### Method 2: Clone from Source
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/Duolingo-Lazy.git
+   git clone https://github.com/kenzn2/Duolingo-Lazy.git
    ```
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" by toggling the switch in the top right corner
