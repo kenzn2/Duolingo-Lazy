@@ -1,0 +1,386 @@
+/* CSS Variables for theming - Updated Duolingo colors */
+:root {
+    --bg-color: #ffffff;
+    --surface-color: #f7f7f7;
+    --text-color: #3c3c3c;
+    --text-secondary: #777777;
+    --border-color: #e5e5e5;
+    --primary-color: #1cb0f6;
+    --primary-hover: #0ea5e9;
+    --secondary-color: #58cc02;
+    --success-color: #58cc02;
+    --success-bg: #f0fdf4;
+    --success-border: #58cc02;
+    --error-color: #ff4b4b;
+    --error-hover: #dc2626;
+    --disabled-bg: #f3f4f6;
+    --disabled-text: #9ca3af;
+    --shadow: rgba(0, 0, 0, 0.1);
+    
+    /* Gradients - Duolingo style */
+    --button-gradient: linear-gradient(180deg, #58cc02 0%, #4caf50 100%);
+    --header-gradient: linear-gradient(180deg, #58cc02 0%, #4caf50 100%);
+}
+
+[data-theme="dark"] {
+    --bg-color: #131f24;
+    --surface-color: #1f2937;
+    --text-color: #ffffff;
+    --text-secondary: #d1d5db;
+    --border-color: #374151;
+    --primary-color: #1cb0f6;
+    --primary-hover: #0ea5e9;
+    --secondary-color: #58cc02;
+    --success-color: #58cc02;
+    --success-bg: #1a2e1a;
+    --success-border: #58cc02;
+    --error-color: #ff6b6b;
+    --error-hover: #dc2626;
+    --disabled-bg: #374151;
+    --disabled-text: #6b7280;
+    --shadow: rgba(0, 0, 0, 0.3);
+    
+    /* Gradients for dark mode */
+    --button-gradient: linear-gradient(180deg, #58cc02 0%, #4caf50 100%);
+    --header-gradient: linear-gradient(180deg, #58cc02 0%, #4caf50 100%);
+}
+
+/* Dark mode button shadow adjustments */
+[data-theme="dark"] .action-button {
+    box-shadow: 0 4px 0 #2d5016;
+}
+
+[data-theme="dark"] .action-button:hover:not(:disabled) {
+    box-shadow: 0 5px 0 #2d5016;
+}
+
+[data-theme="dark"] .action-button:active:not(:disabled) {
+    box-shadow: 0 2px 0 #2d5016;
+}
+
+[data-theme="dark"] .action-button.stop {
+    box-shadow: 0 4px 0 #a61e1e;
+}
+
+[data-theme="dark"] .action-button.stop:hover {
+    box-shadow: 0 5px 0 #a61e1e;
+}
+
+[data-theme="dark"] .action-button.stop:active {
+    box-shadow: 0 2px 0 #a61e1e;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito Sans', 'feather', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    width: 350px;
+    height: 400px;
+    background-color: var(--bg-color);
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#popup-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface-color);
+    transition: background-color 0.3s ease;
+}
+
+#header {
+    background: var(--header-gradient);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.3s ease;
+}
+
+#header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    flex: 1;
+}
+
+.theme-toggle {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+#content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: var(--surface-color);
+    transition: background-color 0.3s ease;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-section label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.input-section input {
+    padding: 10px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 16px;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.input-section input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+.input-section input:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+.checkbox-section {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+    user-select: none;
+    position: relative;
+    padding-left: 25px;
+    transition: color 0.3s ease;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.checkbox-container input:checked + .checkmark {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+}
+
+.checkbox-container input:disabled + .checkmark {
+    background-color: var(--disabled-bg);
+    border-color: var(--border-color);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+.checkbox-container input:checked:disabled + .checkmark {
+    background-color: var(--disabled-text);
+    border-color: var(--disabled-text);
+    color: white;
+}
+
+.checkbox-container.disabled {
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+.button-section {
+    display: flex;
+    justify-content: center;
+}
+
+.action-button {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--button-gradient);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 0 #46a302;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    font-family: inherit;
+}
+
+.action-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 #46a302;
+}
+
+.action-button:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #46a302;
+}
+
+.action-button:disabled {
+    background: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 0 var(--border-color);
+}
+
+.action-button.stop {
+    background: var(--error-color);
+    box-shadow: 0 4px 0 #d12b2b;
+}
+
+.action-button.stop:hover {
+    background: var(--error-hover);
+    box-shadow: 0 5px 0 #d12b2b;
+}
+
+.action-button.stop:active {
+    box-shadow: 0 2px 0 #d12b2b;
+}
+
+#progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--button-gradient);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 8px;
+}
+
+.exp-text {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.completion-message {
+    text-align: center;
+    font-size: 14px;
+    color: var(--success-color);
+    font-weight: 600;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-border);
+    border-radius: 8px;
+    animation: slideIn 0.3s ease-out;
+    transition: all 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* JWT display for debugging - normally hidden */
+#jwt-display {
+    font-size: 10px;
+    color: #999;
+    text-align: center;
+    padding: 5px;
+    border-top: 1px solid #eee;
+    word-break: break-all;
+    max-height: 30px;
+    overflow: hidden;
+}

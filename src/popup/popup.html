@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup.css">
+    <title>Duolingo Lazy</title>
+</head>
+<body>
+    <div id="popup-container">
+        <div id="header">
+            <h1>Duolingo Lazy</h1>
+            <button class="theme-toggle" id="theme-toggle">🌙</button>
+        </div>
+        
+        <div id="content">
+            <div class="input-section">
+                <label for="xp-input">EXP mong muốn:</label>
+                <input type="number" id="xp-input" value="20" min="1">
+            </div>
+            
+            <div class="checkbox-section">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="bonus-checkbox" checked>
+                    <span class="checkmark">✓</span>
+                    Nhận thêm điểm thưởng (Bonus)
+                </label>
+            </div>
+            
+            <div class="button-section">
+                <button id="execute-button" class="action-button">Bắt đầu</button>
+            </div>
+            
+            <div id="progress-section" class="hidden">
+                <div class="progress-text">
+                    <span id="progress-text-span">Hoàn thành: 0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <div class="exp-text">
+                    <span id="exp-counter">Đã đạt: 0 / 100 EXP</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden JWT display for debugging -->
+        <div id="jwt-display" class="hidden"></div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
