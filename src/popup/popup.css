@@ -79,7 +79,7 @@ html, body {
 body {
     font-family: 'Nunito Sans', 'feather', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     width: 350px;
-    height: 400px;
+    height: 520px;
     background-color: var(--bg-color);
     box-sizing: border-box;
     transition: background-color 0.3s ease;
@@ -144,12 +144,13 @@ body {
 
 #content {
     flex: 1;
-    padding: 20px;
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
     background-color: var(--surface-color);
     transition: background-color 0.3s ease;
+    min-height: 0; /* Allow content to shrink if needed */
 }
 
 .input-section {
@@ -383,4 +384,78 @@ body {
     word-break: break-all;
     max-height: 30px;
     overflow: hidden;
+}
+
+/* Footer styling */
+#footer {
+    margin-top: auto;
+    padding: 12px 20px 16px 20px;
+    flex-shrink: 0; /* Prevent footer from shrinking */
+}
+
+.footer-divider {
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--border-color) 20%,
+        var(--border-color) 80%,
+        transparent 100%
+    );
+    margin-bottom: 12px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.footer-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.footer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.footer-icon:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.footer-icon svg {
+    transition: transform 0.2s ease;
+}
+
+.footer-icon:hover svg {
+    transform: scale(1.1);
+}
+
+/* Dark mode footer adjustments */
+[data-theme="dark"] .footer-icon {
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .footer-icon:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }

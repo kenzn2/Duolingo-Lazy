@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
     }
+    
+    // GitHub link handler
+    const githubLink = document.getElementById('github-link');
+    if (githubLink) {
+        githubLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            chrome.tabs.create({ 
+                url: 'https://github.com/kenzn2/Duolingo-Lazy',
+                active: true 
+            });
+        });
+    }
 
     // Execute button click handler
     if (executeButton) {
