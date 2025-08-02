@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize checkbox state
     if (bonusCheckbox) {
-        bonusCheckbox.checked = true;
+        bonusCheckbox.checked = false;
     }
 
     // Theme toggle handler
@@ -83,10 +83,22 @@ function startExecution() {
     }
     
     // Get target XP value
-    targetXP = parseInt(xpInput.value || 20, 10);
+    targetXP = parseInt(xpInput.value || 10, 10);
     totalLessons = Math.ceil(targetXP / 10);
     currentXP = 0;
     completedLessons = 0;
+
+    // Save execution state to storage for recovery
+    if (chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({
+            'executionState': {
+                targetXP: targetXP,
+                totalLessons: totalLessons,
+                isExecuting: true,
+                timestamp: Date.now()
+            }
+        });
+    }
 
     // Switch to execution state
     isExecuting = true;
@@ -119,6 +131,11 @@ function stopExecution() {
     
     // Send stop message to background script
     chrome.runtime.sendMessage({ action: 'stop_execution' });
+    
+    // Clear execution state from storage
+    if (chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(['executionState', 'lastProgressUpdate']);
+    }
     
     resetToInitialState();
 }
@@ -189,10 +206,15 @@ function updateProgress(completed, total, xp) {
     }
 }
 
-function showCompletion(totalXP) {
+function showCompletion(totalXP, fromRestore = false) {
     // Prevent showing completion multiple times
     if (completionShown) return;
     completionShown = true;
+    
+    // Clear execution state from storage when completed (only if not from restore)
+    if (!fromRestore && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(['executionState']);
+    }
     
     updateProgress(completedLessons, totalLessons, totalXP);
     
@@ -278,28 +300,81 @@ function applyTheme(theme) {
 
 // Check for saved progress state when popup opens
 function checkSavedProgress() {
+    // Reset completion flag when popup opens
+    completionShown = false;
+    
     if (chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['lastProgressUpdate'], function(result) {
+        chrome.storage.local.get(['lastProgressUpdate', 'executionState'], function(result) {
             if (result.lastProgressUpdate) {
                 const update = result.lastProgressUpdate;
                 const timeDiff = Date.now() - update.timestamp;
                 
-                // Only apply if update is recent (within 5 minutes) and is active progress
-                if (timeDiff < 5 * 60 * 1000) {
+                // Different time limits for different types
+                let timeLimit;
+                if (update.type === 'duolingo_completed') {
+                    timeLimit = 30 * 60 * 1000; // 30 minutes for completion
+                } else {
+                    timeLimit = 5 * 60 * 1000; // 5 minutes for progress/error
+                }
+                
+                // Only apply if update is within time limit
+                if (timeDiff < timeLimit) {
                     switch (update.type) {
                         case 'duolingo_progress':
+                            // Restore execution state from storage
+                            if (result.executionState) {
+                                const execState = result.executionState;
+                                targetXP = execState.targetXP;
+                                totalLessons = execState.totalLessons;
+                                
+                                // Update input field to show correct target
+                                if (xpInput) {
+                                    xpInput.value = targetXP;
+                                }
+                            } else {
+                                // Fallback to input value if no execution state
+                                targetXP = parseInt(xpInput.value || 10, 10);
+                                totalLessons = Math.ceil(targetXP / 10);
+                            }
+                            
                             // Only restore if execution is still in progress
                             isExecuting = true;
-                            targetXP = parseInt(xpInput.value || 20, 10);
                             updateUIToExecutionState();
                             updateProgress(update.data.completed, update.data.total, update.data.currentXP);
                             break;
                             
-                        // Don't auto-show completed/error states on popup open
+                        // Show completed/error states on popup open if recent
                         case 'duolingo_completed':
+                            // Restore execution state to show correct progress
+                            if (result.executionState) {
+                                const execState = result.executionState;
+                                targetXP = execState.targetXP;
+                                totalLessons = execState.totalLessons;
+                                
+                                // Update input field to show correct target
+                                if (xpInput) {
+                                    xpInput.value = targetXP;
+                                }
+                            } else {
+                                // Try to extract from completed data
+                                targetXP = update.data.totalXP || parseInt(xpInput.value || 10, 10);
+                                totalLessons = Math.ceil(targetXP / 10);
+                            }
+                            
+                            // Show completion UI
+                            progressSection.classList.remove('hidden');
+                            updateProgress(totalLessons, totalLessons, update.data.totalXP);
+                            showCompletion(update.data.totalXP, true); // fromRestore = true
+                            
+                            // Clean up after showing completion
+                            setTimeout(() => {
+                                chrome.storage.local.remove(['lastProgressUpdate', 'executionState']);
+                            }, 5000); // Keep for 5 seconds so user can see it
+                            break;
+                            
                         case 'duolingo_error':
-                            // Clear old completed states
-                            chrome.storage.local.remove(['lastProgressUpdate']);
+                            // Clear old error states and execution state
+                            chrome.storage.local.remove(['lastProgressUpdate', 'executionState']);
                             break;
                     }
                 }
@@ -333,12 +408,13 @@ function startProgressPolling() {
                                     showCompletion(update.data.totalXP);
                                 }
                                 stopProgressPolling();
-                                chrome.storage.local.remove(['lastProgressUpdate']);
+                                chrome.storage.local.remove(['lastProgressUpdate', 'executionState']);
                                 break;
                                 
                             case 'duolingo_error':
                                 showError(`Lỗi: ${update.data.errorText}`);
                                 stopProgressPolling();
+                                chrome.storage.local.remove(['executionState']);
                                 break;
                         }
                     }
@@ -354,3 +430,18 @@ function stopProgressPolling() {
         progressPollingInterval = null;
     }
 }
+
+// Reload button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const reloadButton = document.getElementById('reload-button');
+    if (reloadButton) {
+        reloadButton.addEventListener('click', function() {
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                if (tabs[0]) {
+                    chrome.tabs.reload(tabs[0].id);
+                    window.close(); // Close popup after reload
+                }
+            });
+        });
+    }
+});
