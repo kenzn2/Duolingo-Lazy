@@ -2,6 +2,269 @@ let jwtToken = null;
 let isExecutionRunning = false;
 let executionStopped = false;
 
+// Create context menu on extension install/startup
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.contextMenus.create({
+        id: "duolingo-quick-start",
+        title: "🚀 Start Duolingo Lazy",
+        contexts: ["page"],
+        documentUrlPatterns: ["*://www.duolingo.com/*"]
+    });
+    
+    // Initialize schedule
+    chrome.storage.local.get(['autoScheduleEnabled', 'scheduleTime', 'scheduleXP', 'scheduleBonus', 'scheduleDays'], (settings) => {
+        if (settings.autoScheduleEnabled) {
+            updateSchedule(settings);
+        }
+    });
+});
+
+// Handle context menu clicks
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === "duolingo-quick-start") {
+        // Get default settings and start execution
+        chrome.storage.local.get(['defaultXP', 'defaultBonus'], async (result) => {
+            const defaultXP = result.defaultXP || 10;
+            const defaultBonus = result.defaultBonus || false;
+            const totalLessons = Math.ceil(defaultXP / 10);
+            
+            // Fetch JWT first
+            chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: () => {
+                    try {
+                        const jwt = document.cookie
+                            .split(';')
+                            .find(cookie => cookie.includes('jwt_token'))
+                            ?.split('=')[1];
+                        return jwt || null;
+                    } catch (error) {
+                        console.error("Error retrieving JWT:", error);
+                        return null;
+                    }
+                }
+            }, async (results) => {
+                if (results && results[0]?.result) {
+                    jwtToken = results[0].result;
+                    
+                    // Start execution with default settings
+                    if (!isExecutionRunning) {
+                        isExecutionRunning = true;
+                        executionStopped = false;
+                        
+                        // Save execution state
+                        chrome.storage.local.set({
+                            'executionState': {
+                                targetXP: defaultXP,
+                                totalLessons: totalLessons,
+                                isExecuting: true,
+                                timestamp: Date.now()
+                            }
+                        });
+                        
+                        // Show notification
+                        chrome.notifications.create({
+                            type: 'basic',
+                            iconUrl: 'src/icons/duolingo128.png',
+                            title: 'Duolingo Lazy Started',
+                            message: `Starting automation for ${defaultXP} XP...`
+                        });
+                        
+                        // Start the automation
+                        executeDuolingo(totalLessons, jwtToken, defaultBonus, tab.id);
+                    }
+                } else {
+                    chrome.notifications.create({
+                        type: 'basic',
+                        iconUrl: 'src/icons/duolingo128.png',
+                        title: 'Duolingo Lazy Error',
+                        message: 'Please login to Duolingo first!'
+                    });
+                }
+            });
+        });
+    }
+});
+
+// Auto-schedule management
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'duolingo-schedule') {
+        handleScheduledExecution();
+    }
+});
+
+// Settings update handler
+function handleSettingsUpdate(settings) {
+    // Update context menu visibility
+    updateContextMenu();
+    
+    // Update schedule
+    updateSchedule(settings);
+}
+
+function updateContextMenu() {
+    // Context menu always available, no changes needed for now
+    // Could add conditional visibility based on settings in future
+}
+
+function updateSchedule(settings) {
+    // Clear existing alarm
+    chrome.alarms.clear('duolingo-schedule');
+    
+    if (settings.autoScheduleEnabled) {
+        const now = new Date();
+        const [hours, minutes] = settings.scheduleTime.split(':').map(Number);
+        
+        // Calculate next scheduled time
+        const nextRun = new Date();
+        nextRun.setHours(hours, minutes, 0, 0);
+        
+        // If time has passed today, schedule for tomorrow
+        if (nextRun <= now) {
+            nextRun.setDate(nextRun.getDate() + 1);
+        }
+        
+        // Find next valid day
+        while (!settings.scheduleDays.includes(nextRun.getDay())) {
+            nextRun.setDate(nextRun.getDate() + 1);
+        }
+        
+        // Create alarm
+        chrome.alarms.create('duolingo-schedule', {
+            when: nextRun.getTime()
+        });
+        
+        console.log(`Auto-schedule set for: ${nextRun.toLocaleString()}`);
+    }
+}
+
+async function handleScheduledExecution() {
+    // Get current settings
+    chrome.storage.local.get(['autoScheduleEnabled', 'scheduleXP', 'scheduleBonus', 'scheduleDays', 'scheduleNotifications'], async (settings) => {
+        if (!settings.autoScheduleEnabled) {
+            return;
+        }
+        
+        const today = new Date().getDay();
+        if (!settings.scheduleDays.includes(today)) {
+            // Re-schedule for next valid day
+            updateSchedule(settings);
+            return;
+        }
+        
+        // Check if Duolingo tab is open
+        chrome.tabs.query({ url: "*://www.duolingo.com/*" }, async (tabs) => {
+            if (tabs.length === 0) {
+                // No Duolingo tab - show notification
+                if (settings.scheduleNotifications) {
+                    chrome.notifications.create({
+                        type: 'basic',
+                        iconUrl: 'src/icons/duolingo128.png',
+                        title: 'Duolingo Lazy Schedule',
+                        message: 'Please open Duolingo website for scheduled execution'
+                    });
+                }
+                
+                // Try again in 10 minutes
+                chrome.alarms.create('duolingo-schedule', {
+                    delayInMinutes: 10
+                });
+                return;
+            }
+            
+            const tab = tabs[0];
+            const targetXP = settings.scheduleXP || 20;
+            const enableBonus = settings.scheduleBonus || false;
+            const totalLessons = Math.ceil(targetXP / 10);
+            
+            // Check if already running
+            if (isExecutionRunning) {
+                console.log('Scheduled execution skipped - already running');
+                updateSchedule(settings);
+                return;
+            }
+            
+            // Fetch JWT and start execution
+            chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: () => {
+                    try {
+                        const jwt = document.cookie
+                            .split(';')
+                            .find(cookie => cookie.includes('jwt_token'))
+                            ?.split('=')[1];
+                        return jwt || null;
+                    } catch (error) {
+                        console.error("Error retrieving JWT:", error);
+                        return null;
+                    }
+                }
+            }, async (results) => {
+                if (results && results[0]?.result) {
+                    jwtToken = results[0].result;
+                    
+                    // Save execution state
+                    chrome.storage.local.set({
+                        'executionState': {
+                            targetXP: targetXP,
+                            totalLessons: totalLessons,
+                            isExecuting: true,
+                            timestamp: Date.now(),
+                            scheduledRun: true
+                        }
+                    });
+                    
+                    // Show notification
+                    if (settings.scheduleNotifications) {
+                        chrome.notifications.create({
+                            type: 'basic',
+                            iconUrl: 'src/icons/duolingo128.png',
+                            title: 'Duolingo Lazy Scheduled Run',
+                            message: `Starting scheduled execution for ${targetXP} XP...`
+                        });
+                    }
+                    
+                    // Start execution
+                    try {
+                        const totalXP = await executeDuolingo(totalLessons, jwtToken, enableBonus, tab.id, true);
+                        
+                        // Show completion notification for scheduled runs
+                        if (settings.scheduleNotifications) {
+                            chrome.notifications.create({
+                                type: 'basic',
+                                iconUrl: 'src/icons/duolingo128.png',
+                                title: 'Scheduled Run Completed! 🎉',
+                                message: `Successfully earned ${totalXP} XP automatically!`
+                            });
+                        }
+                    } catch (error) {
+                        if (settings.scheduleNotifications) {
+                            chrome.notifications.create({
+                                type: 'basic',
+                                iconUrl: 'src/icons/duolingo128.png',
+                                title: 'Scheduled Run Failed',
+                                message: `Error: ${error.message}`
+                            });
+                        }
+                    }
+                } else {
+                    if (settings.scheduleNotifications) {
+                        chrome.notifications.create({
+                            type: 'basic',
+                            iconUrl: 'src/icons/duolingo128.png',
+                            title: 'Scheduled Run Failed',
+                            message: 'Please login to Duolingo first!'
+                        });
+                    }
+                }
+                
+                // Schedule next run
+                updateSchedule(settings);
+            });
+        });
+    });
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "fetch_jwt") {
         chrome.tabs.query({ url: "*://www.duolingo.com/*" }, (tabs) => {
@@ -73,6 +336,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         isExecutionRunning = false;
         sendProgressUpdate('duolingo_stopped');
     }
+    
+    if (message.action === "settings_updated") {
+        handleSettingsUpdate(message.settings);
+        sendResponse({ status: "settings_updated" });
+    }
 });
 
 async function duolingoFetchViaContentScript(url, method, headers, body) {
@@ -110,6 +378,37 @@ async function duolingoFetchViaContentScript(url, method, headers, body) {
             });
         });
     });
+}
+
+// Wrapper function for context menu execution
+async function executeDuolingo(lessons, jwt, enableBonus, tabId, isScheduled = false) {
+    try {
+        const totalXP = await Duolingo(lessons, jwt, enableBonus);
+        
+        // Show completion notification (different for scheduled vs manual)
+        const title = isScheduled ? 'Scheduled Run Completed! 🎉' : 'Duolingo Lazy Completed! 🎉';
+        const message = isScheduled 
+            ? `Successfully earned ${totalXP} XP automatically!`
+            : `Successfully earned ${totalXP} XP!`;
+            
+        chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'src/icons/duolingo128.png',
+            title: title,
+            message: message
+        });
+        
+        return totalXP;
+    } catch (error) {
+        const title = isScheduled ? 'Scheduled Run Error' : 'Duolingo Lazy Error';
+        chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'src/icons/duolingo128.png',
+            title: title,
+            message: `Error: ${error.message}`
+        });
+        throw error;
+    }
 }
 
 async function Duolingo(LESSONS, DUOLINGO_JWT, ENABLE_BONUS = false) {

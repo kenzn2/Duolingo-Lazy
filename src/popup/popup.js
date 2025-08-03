@@ -39,6 +39,15 @@ document.addEventListener('DOMContentLoaded', function() {
         themeToggle.addEventListener('click', toggleTheme);
     }
     
+    // Settings link handler
+    const settingsLink = document.getElementById('settings-link');
+    if (settingsLink) {
+        settingsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            chrome.runtime.openOptionsPage();
+        });
+    }
+    
     // GitHub link handler
     const githubLink = document.getElementById('github-link');
     if (githubLink) {

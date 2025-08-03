@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Lazy - Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <img src="../icons/duolingo64.png" alt="Duolingo Lazy" class="logo">
+                <div class="header-text">
+                    <h1>Duolingo Lazy</h1>
+                    <p>Settings & Configuration</p>
+                </div>
+                <button class="theme-toggle" id="theme-toggle">🌙</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="settings-grid">
+                <!-- Default Settings Section -->
+                <section class="settings-section">
+                    <div class="section-header">
+                        <h2>⚙️ Default Settings</h2>
+                        <p>Configure default values for quick execution</p>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <label for="default-xp">Default Target XP</label>
+                            <input type="number" id="default-xp" min="1" max="100" value="10">
+                            <span class="setting-description">XP target when using quick-start (right-click menu)</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="default-bonus">
+                                <span class="checkmark">✓</span>
+                                Enable Bonus XP by default
+                            </label>
+                            <span class="setting-description">Automatically enable bonus points for quick execution</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Auto Schedule Section -->
+                <section class="settings-section">
+                    <div class="section-header">
+                        <h2>🕒 Auto Schedule</h2>
+                        <p>Automatically farm XP at scheduled times</p>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="auto-schedule-enabled">
+                                <span class="checkmark">✓</span>
+                                Enable Auto Schedule
+                            </label>
+                            <span class="setting-description">Automatically run Duolingo Lazy at specified times</span>
+                        </div>
+
+                        <div class="schedule-settings" id="schedule-settings">
+                            <div class="setting-item">
+                                <label for="schedule-time">Daily Schedule Time</label>
+                                <input type="time" id="schedule-time" value="09:00">
+                                <span class="setting-description">Time to automatically start XP farming</span>
+                            </div>
+
+                            <div class="setting-item">
+                                <label for="schedule-xp">Scheduled XP Amount</label>
+                                <input type="number" id="schedule-xp" min="1" max="100" value="20">
+                                <span class="setting-description">XP target for scheduled execution</span>
+                            </div>
+
+                            <div class="setting-item">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="schedule-bonus">
+                                    <span class="checkmark">✓</span>
+                                    Include Bonus XP in scheduled runs
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <label for="schedule-days">Active Days</label>
+                                <div class="days-selector" id="schedule-days">
+                                    <button type="button" class="day-btn" data-day="0">Sun</button>
+                                    <button type="button" class="day-btn" data-day="1">Mon</button>
+                                    <button type="button" class="day-btn" data-day="2">Tue</button>
+                                    <button type="button" class="day-btn" data-day="3">Wed</button>
+                                    <button type="button" class="day-btn" data-day="4">Thu</button>
+                                    <button type="button" class="day-btn" data-day="5">Fri</button>
+                                    <button type="button" class="day-btn" data-day="6">Sat</button>
+                                </div>
+                                <span class="setting-description">Select days when auto-schedule should run</span>
+                            </div>
+                            
+                            <div class="setting-item schedule-status">
+                                <label>Schedule Status</label>
+                                <div class="status-display" id="schedule-status">
+                                    <span class="status-text">Not scheduled</span>
+                                </div>
+                                <span class="setting-description">Current auto-schedule status and next run time</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Notifications Section -->
+                <section class="settings-section">
+                    <div class="section-header">
+                        <h2>🔔 Notifications</h2>
+                        <p>Configure notification preferences</p>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="notifications-enabled" checked>
+                                <span class="checkmark">✓</span>
+                                Enable Notifications
+                            </label>
+                            <span class="setting-description">Show notifications for start, completion, and errors</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="schedule-notifications" checked>
+                                <span class="checkmark">✓</span>
+                                Scheduled Run Notifications
+                            </label>
+                            <span class="setting-description">Notify when scheduled auto-runs start and complete</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Advanced Settings -->
+                <section class="settings-section">
+                    <div class="section-header">
+                        <h2>🔧 Advanced</h2>
+                        <p>Advanced configuration options</p>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <label for="execution-delay">Execution Delay (seconds)</label>
+                            <input type="number" id="execution-delay" min="1" max="10" value="2">
+                            <span class="setting-description">Delay between lesson completions (helps avoid detection)</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="auto-close-popup">
+                                <span class="checkmark">✓</span>
+                                Auto-close popup after start
+                            </label>
+                            <span class="setting-description">Automatically close popup when execution starts</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Save/Reset Actions -->
+            <div class="actions-section">
+                <button class="btn btn-primary" id="save-settings">💾 Save Settings</button>
+                <button class="btn btn-secondary" id="reset-settings">🔄 Reset to Defaults</button>
+                <button class="btn btn-info" id="test-notification">🔔 Test Notification</button>
+            </div>
+
+            <!-- Status Message -->
+            <div class="status-message" id="status-message"></div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 Duolingo Lazy Extension</p>
+                <div class="footer-links">
+                    <a href="https://github.com/kenzn2/Duolingo-Lazy" target="_blank">GitHub</a>
+                    <span>|</span>
+                    <a href="#" id="export-settings">Export Settings</a>
+                    <span>|</span>
+                    <a href="#" id="import-settings">Import Settings</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="import-file" accept=".json" style="display: none;">
+
+    <script src="options.js"></script>
+</body>
+</html>
