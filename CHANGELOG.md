@@ -5,6 +5,38 @@ All notable changes to Duolingo Lazy extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-08-05
+
+### Added
+- **Context menu integration**: Right-click on any page to quickly execute Duolingo automation
+- **Auto-schedule system**: Schedule automatic XP farming at specific times with daily recurrence
+- **Advanced settings page**: Comprehensive configuration interface with theme support
+- **Schedule status display**: Real-time display of next scheduled run time
+- **Chrome alarms API**: Background scheduling system for automated execution
+- **Notification system**: Alerts for execution start, completion, and errors
+- **Settings import/export**: Backup and restore extension configuration
+- **Time picker interface**: User-friendly time selection with AM/PM format
+
+### Changed
+- **Button layout**: Reorganized popup footer with Settings button rightmost, GitHub button adjacent
+- **Default values**: Updated to 10 XP target and disabled bonus across all interfaces
+- **Auto-schedule defaults**: All days selected by default, 12:00 PM default time
+- **UI optimization**: Removed verbose setting descriptions for cleaner interface
+- **Time format**: Restored AM/PM format with clear labeling for better UX
+
+### Fixed
+- **Progress display bug**: Fixed issue where progress wasn't shown when using context menu execution
+- **Execution state synchronization**: Unified state management between popup and context menu
+- **JWT token persistence**: Improved token validation and storage across browser sessions
+- **Settings persistence**: Enhanced Chrome storage integration for reliable configuration saving
+
+### Technical Details
+- Added `contextMenus`, `alarms`, and `notifications` permissions to manifest
+- Implemented comprehensive background script with schedule management
+- Enhanced content script with health check mechanism
+- Added CSS improvements for time input styling and responsive design
+- Implemented execution state synchronization between different interface methods
+
 ## [1.2.0] - 2025-08-02
 
 ### Added
