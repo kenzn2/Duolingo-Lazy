@@ -3,10 +3,10 @@ const DEFAULT_SETTINGS = {
     defaultXP: 10,
     defaultBonus: false,
     autoScheduleEnabled: false,
-    scheduleTime: '09:00',
-    scheduleXP: 20,
+    scheduleTime: '12:00',
+    scheduleXP: 10,
     scheduleBonus: false,
-    scheduleDays: [1, 2, 3, 4, 5], // Mon-Fri
+    scheduleDays: [0, 1, 2, 3, 4, 5, 6], // All days
     notificationsEnabled: true,
     scheduleNotifications: true,
     executionDelay: 2,
@@ -51,7 +51,6 @@ function initializeElements() {
         // Actions
         saveSettings: document.getElementById('save-settings'),
         resetSettings: document.getElementById('reset-settings'),
-        testNotification: document.getElementById('test-notification'),
         exportSettings: document.getElementById('export-settings'),
         importSettings: document.getElementById('import-settings'),
         importFile: document.getElementById('import-file'),
@@ -84,7 +83,6 @@ function attachEventListeners() {
     // Actions
     elements.saveSettings.addEventListener('click', saveSettings);
     elements.resetSettings.addEventListener('click', resetSettings);
-    elements.testNotification.addEventListener('click', testNotification);
     elements.exportSettings.addEventListener('click', exportSettings);
     elements.importSettings.addEventListener('click', () => elements.importFile.click());
     elements.importFile.addEventListener('change', importSettings);
@@ -267,20 +265,6 @@ function resetSettings() {
     if (confirm('Are you sure you want to reset all settings to default values?')) {
         populateSettings(DEFAULT_SETTINGS);
         showStatusMessage('Settings reset to defaults! 🔄', 'success');
-    }
-}
-
-function testNotification() {
-    if (chrome.notifications) {
-        chrome.notifications.create({
-            type: 'basic',
-            iconUrl: '../icons/duolingo128.png',
-            title: 'Duolingo Lazy Test',
-            message: 'Notifications are working perfectly! 🔔'
-        });
-        showStatusMessage('Test notification sent! 🔔', 'success');
-    } else {
-        showStatusMessage('Notifications not available', 'error');
     }
 }
 

@@ -35,7 +35,6 @@
                         <div class="setting-item">
                             <label for="default-xp">Default Target XP</label>
                             <input type="number" id="default-xp" min="1" max="100" value="10">
-                            <span class="setting-description">XP target when using quick-start (right-click menu)</span>
                         </div>
 
                         <div class="setting-item">
@@ -44,7 +43,6 @@
                                 <span class="checkmark">✓</span>
                                 Enable Bonus XP by default
                             </label>
-                            <span class="setting-description">Automatically enable bonus points for quick execution</span>
                         </div>
                     </div>
                 </section>
@@ -68,15 +66,13 @@
 
                         <div class="schedule-settings" id="schedule-settings">
                             <div class="setting-item">
-                                <label for="schedule-time">Daily Schedule Time</label>
-                                <input type="time" id="schedule-time" value="09:00">
-                                <span class="setting-description">Time to automatically start XP farming</span>
+                                <label for="schedule-time">Daily Schedule Time (AM/PM format)</label>
+                                <input type="time" id="schedule-time" value="12:00">
                             </div>
 
                             <div class="setting-item">
                                 <label for="schedule-xp">Scheduled XP Amount</label>
-                                <input type="number" id="schedule-xp" min="1" max="100" value="20">
-                                <span class="setting-description">XP target for scheduled execution</span>
+                                <input type="number" id="schedule-xp" min="1" max="100" value="10">
                             </div>
 
                             <div class="setting-item">
@@ -170,7 +166,6 @@
             <div class="actions-section">
                 <button class="btn btn-primary" id="save-settings">💾 Save Settings</button>
                 <button class="btn btn-secondary" id="reset-settings">🔄 Reset to Defaults</button>
-                <button class="btn btn-info" id="test-notification">🔔 Test Notification</button>
             </div>
 
             <!-- Status Message -->

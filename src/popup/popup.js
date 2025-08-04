@@ -26,13 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme
     initializeTheme();
     
+    // Load default settings
+    loadDefaultSettings();
+    
     // Check for saved progress state
     checkSavedProgress();
-    
-    // Initialize checkbox state
-    if (bonusCheckbox) {
-        bonusCheckbox.checked = false;
-    }
 
     // Theme toggle handler
     if (themeToggle) {
@@ -79,6 +77,31 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('beforeunload', () => {
     stopProgressPolling();
 });
+
+// Load default settings from storage
+async function loadDefaultSettings() {
+    try {
+        const result = await chrome.storage.local.get([
+            'defaultXP',
+            'defaultBonus'
+        ]);
+        
+        // Set default XP value
+        if (xpInput && result.defaultXP) {
+            xpInput.value = result.defaultXP;
+        }
+        
+        // Set default bonus checkbox
+        if (bonusCheckbox && result.defaultBonus !== undefined) {
+            bonusCheckbox.checked = result.defaultBonus;
+        }
+    } catch (error) {
+        console.log('Could not load default settings:', error);
+        // Set fallback defaults
+        if (xpInput) xpInput.value = 10;
+        if (bonusCheckbox) bonusCheckbox.checked = false;
+    }
+}
 
 // Execution Functions
 function startExecution() {

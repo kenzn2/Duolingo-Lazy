@@ -1,4 +1,10 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "ping") {
+        // Simple ping response to test if content script is responsive
+        sendResponse({ pong: true });
+        return true;
+    }
+    
     if (message.action === "duolingo_api") {
         const { url, method, headers, body } = message;
         console.log("[ContentScript] Fetching:", url, method, headers, body);
