@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Duolingo Lazy",
   "version": "1.3.0",
-  "description": "Automate Duolingo lessons to maintain your learning streak effortlessly. Beautiful UI with dark mode, real-time progress tracking, and smart persistence.",
+  "description": "Automate Duolingo lessons to maintain your learning streak effortlessly",
   "author": "Kenzn2 <https://www.fb.com/kenzn2>",
   "permissions": [
     "webRequest",
