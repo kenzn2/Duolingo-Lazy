@@ -18,6 +18,9 @@ Thumbs.db
 *.swo
 *~
 
+# Store submission info (sensitive)
+STORE_SUBMISSION.md
+
 # Extension package files
 *.zip
 *.crx
