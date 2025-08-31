@@ -37,15 +37,20 @@ duolingo-lazy/
 
 ## 🚀 Installation
 
-### Method 1: From GitHub Releases (Recommended)
+### Method 1: Chrome Web Store (Recommended)
+1. Visit [Chrome Web Store](https://chromewebstore.google.com/detail/omooaaecencefjcahmekmohhpbcmjldi?utm_source=github)
+2. Click "Add to Chrome" to install the extension
+3. Confirm installation and the extension will be ready to use
+
+### Method 2: From GitHub Releases
 1. Go to the [Releases page](https://github.com/kenzn2/Duolingo-Lazy/releases)
-2. Download the latest `duolingo-lazy-1.0.0.zip` file
+2. Download the latest file
 3. Extract the ZIP file to a folder
 4. Open Chrome and go to `chrome://extensions/`
 5. Enable "Developer mode" (toggle in top right)
 6. Click "Load unpacked" and select the extracted folder
 
-### Method 2: Clone from Source
+### Method 3: Clone from Source
 1. Clone this repository:
    ```bash
    git clone https://github.com/kenzn2/Duolingo-Lazy.git
