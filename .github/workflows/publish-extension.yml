@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'  # Trigger on version tags like v1.3.2, v2.0.0
 
+permissions:
+  contents: write  # Required for creating releases
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -39,15 +42,9 @@ jobs:
             -x "*.github*" \
             -x "*dist*"
       
-      - name: Upload to Chrome Web Store
-        uses: mnao305/chrome-extension-upload@v5.0.0
-        with:
-          file-path: dist/duolingo-lazy-${{ steps.get_version.outputs.VERSION }}.zip
-          extension-id: omooaaecencefjcahmekmohhpbcmjldi
-          client-id: ${{ secrets.CHROME_CLIENT_ID }}
-          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
-          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          publish: true  # Set to false for draft only
+      # Chrome Web Store upload được comment - upload thủ công file ZIP từ GitHub Release
+      # Nếu muốn auto-upload, cần setup 3 secrets: CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN
+      # Xem hướng dẫn tại: CI_CD_SETUP.md
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -56,11 +53,12 @@ jobs:
           body: |
             ## 🎉 Release v${{ steps.get_version.outputs.VERSION }}
             
-            Chrome Extension đã được cập nhật lên Chrome Web Store.
+            ### 📦 Cài đặt
+            1. Tải file ZIP bên dưới
+            2. Upload thủ công lên [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
             
-            ### Cài đặt
-            - [Chrome Web Store](https://chromewebstore.google.com/detail/duolingo-lazy/omooaaecencefjcahmekmohhpbcmjldi)
-            - Hoặc tải file ZIP bên dưới để cài đặt thủ công
+            ### 🔧 Auto-upload (tùy chọn)
+            Nếu muốn tự động upload, xem hướng dẫn setup tại `CI_CD_SETUP.md`
           draft: false
           prerelease: false
         env:
