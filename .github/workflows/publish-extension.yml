@@ -1,0 +1,78 @@
+name: Publish Chrome Extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.3.2, v2.0.0
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Update manifest version
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" manifest.json
+          echo "Updated manifest.json to version $VERSION"
+      
+      - name: Create ZIP package
+        run: |
+          mkdir -p dist
+          zip -r dist/duolingo-lazy-${{ steps.get_version.outputs.VERSION }}.zip \
+            manifest.json \
+            src/ \
+            -x "*.git*" \
+            -x "*node_modules*" \
+            -x "*.github*" \
+            -x "*dist*"
+      
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: dist/duolingo-lazy-${{ steps.get_version.outputs.VERSION }}.zip
+          extension-id: omooaaecencefjcahmekmohhpbcmjldi
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: true  # Set to false for draft only
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/duolingo-lazy-${{ steps.get_version.outputs.VERSION }}.zip
+          body: |
+            ## 🎉 Release v${{ steps.get_version.outputs.VERSION }}
+            
+            Chrome Extension đã được cập nhật lên Chrome Web Store.
+            
+            ### Cài đặt
+            - [Chrome Web Store](https://chromewebstore.google.com/detail/duolingo-lazy/omooaaecencefjcahmekmohhpbcmjldi)
+            - Hoặc tải file ZIP bên dưới để cài đặt thủ công
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Extension v${{ steps.get_version.outputs.VERSION }} đã được publish thành công!"
+          echo "🔗 Chrome Web Store: https://chromewebstore.google.com/detail/duolingo-lazy/omooaaecencefjcahmekmohhpbcmjldi"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Publish thất bại! Vui lòng kiểm tra logs."

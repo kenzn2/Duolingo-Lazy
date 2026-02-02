@@ -8,10 +8,10 @@ let completedLessons = 0;
 let completionShown = false;
 
 // UI Elements
-let executeButton, xpInput, bonusCheckbox, progressSection, progressTextSpan, progressBar, expCounter, jwtDisplay, themeToggle;
+let executeButton, xpInput, bonusCheckbox, progressSection, progressTextSpan, progressBar, expCounter, jwtDisplay, themeToggle, languageToggle;
 let progressPollingInterval = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Initialize UI elements
     executeButton = document.getElementById('execute-button');
     xpInput = document.getElementById('xp-input');
@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
     expCounter = document.getElementById('exp-counter');
     jwtDisplay = document.getElementById('jwt-display');
     themeToggle = document.getElementById('theme-toggle');
+    languageToggle = document.getElementById('language-toggle');
+    
+    // Initialize language
+    await initializeLanguage();
     
     // Initialize theme
     initializeTheme();
@@ -31,6 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check for saved progress state
     checkSavedProgress();
+
+    // Language toggle handler
+    if (languageToggle) {
+        languageToggle.addEventListener('click', async () => {
+            await toggleLanguage();
+            // Reload UI text after language change
+            updateProgressText();
+        });
+    }
 
     // Theme toggle handler
     if (themeToggle) {
@@ -54,6 +67,30 @@ document.addEventListener('DOMContentLoaded', function() {
             chrome.tabs.create({ 
                 url: 'https://github.com/kenzn2/Duolingo-Lazy',
                 active: true 
+            });
+        });
+    }
+    
+    // Rate link handler
+    const rateLink = document.getElementById('rate-link');
+    if (rateLink) {
+        rateLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            chrome.tabs.create({
+                url: 'https://chromewebstore.google.com/detail/duolingo-lazy/omooaaecencefjcahmekmohhpbcmjldi/reviews',
+                active: true
+            });
+        });
+    }
+    
+    // Report link handler
+    const reportLink = document.getElementById('report-link');
+    if (reportLink) {
+        reportLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            chrome.tabs.create({
+                url: 'https://github.com/kenzn2/Duolingo-Lazy/issues',
+                active: true
             });
         });
     }
@@ -173,14 +210,16 @@ function stopExecution() {
 }
 
 // UI Update Functions
-function updateUIToExecutionState() {
+async function updateUIToExecutionState() {
+    const lang = await getCurrentLanguage();
+    
     // Disable inputs
     xpInput.disabled = true;
     bonusCheckbox.disabled = true;
     bonusCheckbox.parentElement.classList.add('disabled');
     
     // Change button to stop
-    executeButton.textContent = 'Dừng';
+    executeButton.textContent = t('stopButton', lang);
     executeButton.classList.add('stop');
     
     // Show progress section
@@ -191,7 +230,9 @@ function updateUIToExecutionState() {
     startProgressPolling();
 }
 
-function resetToInitialState(keepCompletion = false) {
+async function resetToInitialState(keepCompletion = false) {
+    const lang = await getCurrentLanguage();
+    
     // Reset execution state
     isExecuting = false;
     
@@ -204,7 +245,7 @@ function resetToInitialState(keepCompletion = false) {
     bonusCheckbox.parentElement.classList.remove('disabled');
     
     // Reset button
-    executeButton.textContent = 'Bắt đầu';
+    executeButton.textContent = t('startButton', lang);
     executeButton.classList.remove('stop');
     
     // Hide progress section unless keeping completion
@@ -223,22 +264,30 @@ function updateProgress(completed, total, xp) {
     completedLessons = completed;
     currentXP = xp;
     
+    updateProgressText();
+}
+
+async function updateProgressText() {
+    const lang = await getCurrentLanguage();
+    
     // Calculate percentage based on actual XP earned vs target XP
     const percentage = targetXP > 0 ? Math.min(100, Math.round((currentXP / targetXP) * 100)) : 0;
     
     // Update UI elements
     if (progressTextSpan) {
-        progressTextSpan.textContent = `Hoàn thành: ${percentage}%`;
+        progressTextSpan.textContent = t('progressText', lang, { percent: percentage });
     }
     if (progressBar) {
         progressBar.style.width = `${percentage}%`;
     }
     if (expCounter) {
-        expCounter.textContent = `Đã đạt: ${currentXP} / ${targetXP} EXP`;
+        expCounter.textContent = t('expCounter', lang, { current: currentXP, target: targetXP });
     }
 }
 
-function showCompletion(totalXP, fromRestore = false) {
+async function showCompletion(totalXP, fromRestore = false) {
+    const lang = await getCurrentLanguage();
+    
     // Prevent showing completion multiple times
     if (completionShown) return;
     completionShown = true;
@@ -254,7 +303,7 @@ function showCompletion(totalXP, fromRestore = false) {
     setTimeout(() => {
         const completionMessage = document.createElement('div');
         completionMessage.className = 'completion-message';
-        completionMessage.innerHTML = `🎉 Hoàn thành! Bạn đã nhận được ${totalXP} XP!`;
+        completionMessage.innerHTML = `🎉 ${t('completionMessage', lang, { xp: totalXP })}`;
         
         // Insert after exp counter
         if (expCounter && expCounter.parentNode) {
@@ -477,3 +526,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Language initialization and management
+async function initializeLanguage() {
+    const lang = await getCurrentLanguage();
+    
+    // Set language toggle button text
+    if (languageToggle) {
+        languageToggle.textContent = lang === 'en' ? 'VI' : 'EN';
+    }
+    
+    // Update all UI text with current language
+    await updateUILanguage();
+}

@@ -5,9 +5,11 @@ A Chrome extension that automates Duolingo lesson completion to help you maintai
 ## ✨ Features
 
 - 🎯 **Auto XP Farming**: Automatically complete lessons to earn desired XP
+- � **Multi-language Support**: Switch between English and Vietnamese (auto-detects browser language)
 - 🎨 **Beautiful UI**: Modern design with Dark/Light theme support
 - 📊 **Real-time Progress**: Live progress tracking with persistence
 - 🎁 **Bonus Points**: Option to enable bonus XP rewards
+- ⭐ **Quick Rate & Report**: Easy access to rate the extension or report issues
 - 🛡️ **Error Handling**: Robust error handling and user-friendly messages
 - 💾 **Smart Persistence**: Maintains progress even when popup is closed
 
@@ -26,10 +28,15 @@ duolingo-lazy/
 ├── src/
 │   ├── background.js        # Service worker for API calls and automation
 │   ├── content.js          # Content script for Duolingo page interaction
+│   ├── i18n.js             # Internationalization (multi-language support)
 │   ├── popup/
 │   │   ├── popup.html      # Extension popup UI structure
 │   │   ├── popup.js        # Popup logic and user interactions
 │   │   └── popup.css       # Modern styling with theme support
+│   ├── options/
+│   │   ├── options.html    # Settings page structure
+│   │   ├── options.js      # Settings page logic
+│   │   └── options.css     # Settings page styling
 │   └── icons/              # Extension icons
 ├── manifest.json           # Chrome extension configuration
 └── README.md              # This documentation

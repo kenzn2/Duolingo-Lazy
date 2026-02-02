@@ -16,8 +16,9 @@ const DEFAULT_SETTINGS = {
 // DOM elements
 let elements = {};
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     initializeElements();
+    await initializeLanguage();
     initializeTheme();
     loadSettings();
     attachEventListeners();
@@ -25,8 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeElements() {
     elements = {
-        // Theme
+        // Theme & Language
         themeToggle: document.getElementById('theme-toggle'),
+        languageToggle: document.getElementById('language-toggle'),
         
         // Default Settings
         defaultXP: document.getElementById('default-xp'),
@@ -66,6 +68,13 @@ function initializeElements() {
 function attachEventListeners() {
     // Theme toggle
     elements.themeToggle.addEventListener('click', toggleTheme);
+    
+    // Language toggle
+    if (elements.languageToggle) {
+        elements.languageToggle.addEventListener('click', async () => {
+            await toggleLanguage();
+        });
+    }
     
     // Auto schedule toggle
     elements.autoScheduleEnabled.addEventListener('change', () => {
@@ -323,4 +332,17 @@ if (chrome.runtime && chrome.runtime.onMessage) {
             applyTheme(message.theme);
         }
     });
+}
+
+// Language initialization and management
+async function initializeLanguage() {
+    const lang = await getCurrentLanguage();
+    
+    // Set language toggle button text
+    if (elements.languageToggle) {
+        elements.languageToggle.textContent = lang === 'en' ? 'VI' : 'EN';
+    }
+    
+    // Update all UI text with current language
+    await updateUILanguage();
 }

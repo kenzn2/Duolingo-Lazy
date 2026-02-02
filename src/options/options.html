@@ -18,7 +18,10 @@
                     <h1>Duolingo Lazy</h1>
                     <p>Settings & Configuration</p>
                 </div>
-                <button class="theme-toggle" id="theme-toggle">🌙</button>
+                <div class="header-controls">
+                    <button class="language-toggle" id="language-toggle">EN</button>
+                    <button class="theme-toggle" id="theme-toggle">🌙</button>
+                </div>
             </div>
         </header>
 
@@ -193,6 +196,7 @@
     <!-- Hidden file input for import -->
     <input type="file" id="import-file" accept=".json" style="display: none;">
 
+    <script src="../i18n.js"></script>
     <script src="options.js"></script>
 </body>
 </html>

@@ -13,7 +13,10 @@
     <div id="popup-container">
         <div id="header">
             <h1>Duolingo Lazy</h1>
-            <button class="theme-toggle" id="theme-toggle">🌙</button>
+            <div class="header-controls">
+                <button class="language-toggle" id="language-toggle">EN</button>
+                <button class="theme-toggle" id="theme-toggle">🌙</button>
+            </div>
         </div>
         
         <div id="content">
@@ -54,6 +57,20 @@
         <div id="footer">
             <div class="footer-divider"></div>
             <div class="footer-content">
+                <div class="footer-left">
+                    <a href="https://chromewebstore.google.com/detail/duolingo-lazy/omooaaecencefjcahmekmohhpbcmjldi/reviews" target="_blank" class="footer-link" id="rate-link" title="Rate this extension">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                        <span class="footer-link-text">Rate</span>
+                    </a>
+                    <a href="https://chromewebstore.google.com/detail/omooaaecencefjcahmekmohhpbcmjldi/support" target="_blank" class="footer-link" id="report-link" title="Report an issue">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                        <span class="footer-link-text">Report</span>
+                    </a>
+                </div>
                 <div class="footer-icons">
                     <a href="https://github.com/kenzn2/Duolingo-Lazy" target="_blank" class="footer-icon" id="github-link" title="View on GitHub">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -72,6 +89,7 @@
         <!-- Hidden JWT display for debugging -->
         <div id="jwt-display" class="hidden"></div>
     </div>
+    <script src="../i18n.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>
