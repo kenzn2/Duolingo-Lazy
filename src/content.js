@@ -7,7 +7,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     
     if (message.action === "duolingo_api") {
         const { url, method, headers, body } = message;
-        console.log("[ContentScript] Fetching:", url, method, headers, body);
+        // Do not log headers or body because they may contain the JWT token.
+        console.log("[ContentScript] Fetching:", method, url);
         fetch(url, {
             method,
             headers,
@@ -16,7 +17,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         })
         .then(async (response) => {
             const text = await response.text();
-            console.log("[ContentScript] Response:", response.status, Array.from(response.headers.entries()), text);
+            console.log("[ContentScript] Response status:", response.status);
             sendResponse({
                 ok: response.ok,
                 status: response.status,

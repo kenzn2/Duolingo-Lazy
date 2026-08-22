@@ -5,6 +5,18 @@ All notable changes to Duolingo Lazy extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3] - 2026-08-22
+
+### Changed
+- Open Duolingo automatically in a background tab when no Duolingo tab is available.
+- Keep the popup available while JWT retrieval and execution are in progress.
+- Use the configured execution delay instead of a hard-coded delay.
+- Avoid logging JWT-bearing request headers, request bodies, and API response bodies.
+- Simplify JWT retrieval by removing the duplicate popup message request.
+
+### Fixed
+- Handle missing or invalid scheduled-day settings safely.
+
 ## [1.3.0] - 2025-08-05
 
 ### Added

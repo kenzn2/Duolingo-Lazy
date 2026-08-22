@@ -175,22 +175,20 @@ function startExecution() {
 
     // Fetch JWT and start execution
     chrome.runtime.sendMessage({ action: 'fetch_jwt' }, (fetchResponse) => {
-        chrome.runtime.sendMessage({ action: 'get_jwt' }, (getResponse) => {
-            if (getResponse && getResponse.jwt) {
-                jwt_key = getResponse.jwt;
-                jwtDisplay.textContent = getResponse.jwt.substring(0, 50) + '...';
-                
-                // Send execution request to background script
-                chrome.runtime.sendMessage({ 
-                    action: 'execute_duolingo', 
-                    lessons: totalLessons, 
-                    jwt: jwt_key,
-                    enableBonus: bonusCheckbox.checked
-                });
-            } else {
-                showError("JWT token không tìm thấy. Vui lòng đăng nhập Duolingo trước.");
-                resetToInitialState();
-            }
+        if (chrome.runtime.lastError || !fetchResponse?.jwt) {
+            showError("JWT token không tìm thấy. Vui lòng đăng nhập Duolingo trước.");
+            resetToInitialState();
+            return;
+        }
+
+        jwt_key = fetchResponse.jwt;
+        jwtDisplay.textContent = fetchResponse.jwt.substring(0, 50) + '...';
+        // Send execution request to background script
+        chrome.runtime.sendMessage({
+            action: 'execute_duolingo',
+            lessons: totalLessons,
+            jwt: jwt_key,
+            enableBonus: bonusCheckbox.checked
         });
     });
 }

@@ -5,6 +5,10 @@ let executionStopped = false;
 // Constants
 const NOTIFICATION_ICON = chrome.runtime.getURL('src/icons/duolingo128.png');
 
+const DEFAULT_EXECUTION_DELAY_SECONDS = 2;
+const MIN_EXECUTION_DELAY_SECONDS = 1;
+const MAX_EXECUTION_DELAY_SECONDS = 10;
+
 // Load stored JWT token on startup
 chrome.storage.local.get(['storedJWT'], (result) => {
     if (result.storedJWT) {
@@ -63,10 +67,20 @@ async function getValidJWT(forceRefresh = false) {
     
     // Try to get token from any open Duolingo tab
     return new Promise((resolve) => {
-        chrome.tabs.query({ url: "*://www.duolingo.com/*" }, (tabs) => {
+        chrome.tabs.query({ url: "*://www.duolingo.com/*" }, async (tabs) => {
             if (tabs.length === 0) {
-                console.log('No Duolingo tabs found for JWT refresh');
-                resolve(null);
+                console.log('No Duolingo tabs found, opening Duolingo for JWT refresh');
+
+                try {
+                    // Open the page in the background so the popup stays open.
+                    // The new tab remains available for the user to open and sign in.
+                    await ensureDuolingoTab();
+                    const refreshedJWT = await getValidJWT(true);
+                    resolve(refreshedJWT);
+                } catch (error) {
+                    console.log('Failed to open Duolingo for JWT refresh:', error);
+                    resolve(null);
+                }
                 return;
             }
             
@@ -102,7 +116,7 @@ async function getValidJWT(forceRefresh = false) {
 }
 
 // Auto-create Duolingo tab if needed
-async function ensureDuolingoTab() {
+async function ensureDuolingoTab(showToUser = false) {
     return new Promise((resolve) => {
         chrome.tabs.query({ url: "*://www.duolingo.com/*" }, (tabs) => {
             if (tabs.length > 0) {
@@ -111,7 +125,7 @@ async function ensureDuolingoTab() {
                 // Create new Duolingo tab
                 chrome.tabs.create({ 
                     url: 'https://www.duolingo.com/learn',
-                    active: false  // Don't switch to the tab
+                    active: showToUser
                 }, (newTab) => {
                     // Wait a bit for the page to load
                     setTimeout(() => {
@@ -669,7 +683,10 @@ async function handleScheduledExecution() {
         }
         
         const today = new Date().getDay();
-        if (!settings.scheduleDays.includes(today)) {
+        const scheduleDays = Array.isArray(settings.scheduleDays)
+            ? settings.scheduleDays
+            : [0, 1, 2, 3, 4, 5, 6];
+        if (!scheduleDays.includes(today)) {
             // Re-schedule for next valid day
             updateSchedule(settings);
             return;
@@ -1038,6 +1055,18 @@ async function Duolingo(LESSONS, DUOLINGO_JWT, ENABLE_BONUS = false) {
         const { fromLanguage, learningLanguage } = JSON.parse(userResult.body);
         
         let xp = 0;
+        const executionSettings = await chrome.storage.local.get(['executionDelay']);
+        const configuredDelay = Number(executionSettings.executionDelay);
+        const executionDelaySeconds = Math.min(
+            Math.max(
+                Number.isFinite(configuredDelay)
+                    ? configuredDelay
+                    : DEFAULT_EXECUTION_DELAY_SECONDS,
+                MIN_EXECUTION_DELAY_SECONDS
+            ),
+            MAX_EXECUTION_DELAY_SECONDS
+        );
+
         for (let i = 0; i < LESSONS; i++) {
             // Check if execution was stopped
             if (executionStopped) {
@@ -1119,7 +1148,7 @@ async function Duolingo(LESSONS, DUOLINGO_JWT, ENABLE_BONUS = false) {
                 console.log('Progress update sent for lesson', i + 1);
                 
                 // Add small delay to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, executionDelaySeconds * 1000));
                 
             } catch (err) {
                 sendProgressUpdate('duolingo_error', { errorText: `Exception in session creation: ${err.message}` });
