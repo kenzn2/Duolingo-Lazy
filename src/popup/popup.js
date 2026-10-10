@@ -319,7 +319,7 @@ function showError(errorMessage) {
     // Make error messages more user-friendly
     let friendlyMessage = errorMessage;
     
-    if (errorMessage.includes("Content script error") || errorMessage.includes("No response from content script")) {
+    if (errorMessage.includes("Content script error") || errorMessage.includes("No response from content script") || errorMessage.includes("Content script failed")) {
         friendlyMessage = "Lỗi kết nối với trang Duolingo. Vui lòng refresh trang Duolingo và thử lại.";
     } else if (errorMessage.includes("No Duolingo tab found")) {
         friendlyMessage = "Không tìm thấy trang Duolingo. Vui lòng mở trang duolingo.com trước.";
