@@ -884,27 +884,58 @@ async function duolingoFetchViaContentScript(url, method, headers, body) {
             if (tabs.length > 0) {
                 // We have a Duolingo tab, use content script
                 const tabId = tabs[0].id;
+                let settled = false;
+                const settle = (result) => {
+                    if (!settled) {
+                        settled = true;
+                        resolve(result);
+                    }
+                };
                 
                 const timeout = setTimeout(() => {
                     console.log('Content script timeout');
-                    resolve({ ok: false, error: "Content script timeout" });
+                    settle({ ok: false, error: "Content script timeout" });
                 }, 10000); // 10 seconds timeout
-                
-                chrome.tabs.sendMessage(tabId, {
+
+                const payload = {
                     action: "duolingo_api",
                     url,
                     method,
                     headers,
                     body
-                }, (response) => {
-                    clearTimeout(timeout);
-                    
+                };
+
+                chrome.tabs.sendMessage(tabId, payload, (response) => {
                     if (chrome.runtime.lastError || !response) {
-                        console.log('Content script failed:', chrome.runtime.lastError?.message);
-                        resolve({ ok: false, error: "Content script failed" });
+                        console.log('Content script not ready, trying to inject:', chrome.runtime.lastError?.message);
+
+                        chrome.scripting.executeScript({
+                            target: { tabId },
+                            files: ['src/content.js']
+                        }, () => {
+                            if (chrome.runtime.lastError) {
+                                clearTimeout(timeout);
+                                console.log('Content script injection failed:', chrome.runtime.lastError?.message);
+                                settle({ ok: false, error: "Content script failed" });
+                                return;
+                            }
+
+                            chrome.tabs.sendMessage(tabId, payload, (retryResponse) => {
+                                clearTimeout(timeout);
+
+                                if (chrome.runtime.lastError || !retryResponse) {
+                                    console.log('Content script retry failed:', chrome.runtime.lastError?.message);
+                                    settle({ ok: false, error: "Content script failed" });
+                                } else {
+                                    console.log('Content script response received after reinjection');
+                                    settle(retryResponse);
+                                }
+                            });
+                        });
                     } else {
+                        clearTimeout(timeout);
                         console.log('Content script response received successfully');
-                        resolve(response);
+                        settle(response);
                     }
                 });
             } else {
